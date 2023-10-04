@@ -1,0 +1,12 @@
+apiVersion: grafana.minicali.com/v1alpha1
+kind: GrafanaInstance
+metadata:
+  labels:
+    app.kubernetes.io/name: grafanainstance
+    app.kubernetes.io/instance: grafanainstance-sample
+    app.kubernetes.io/part-of: grafana-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: grafana-operator
+  name: grafanainstance-sample
+spec:
+  # TODO(user): Add fields here

@@ -22,6 +22,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	GrafanaGeneralFolder = "General"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -30,6 +34,8 @@ type GrafanaDashboardSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 	Content string `json:"content,omitempty"`
+	Folder  string `json:"folder,omitempty"`
+	Name    string `json:"name,omitempty"`
 
 	// SyncPeriod is the time duration to wait between each sync operation.
 	// The operator will check the actual state in Grafana and reconcile it with the desired state defined in the custom resource.
@@ -45,6 +51,10 @@ func (d *GrafanaDashboard) SetDefaults() {
 	if d.Spec.SyncPeriod.Duration == 0 {
 		d.Spec.SyncPeriod.Duration = 5 * time.Minute
 	}
+
+	if d.Spec.Folder == "" {
+		d.Spec.Folder = GrafanaGeneralFolder
+	}
 }
 
 // GrafanaInstanceRef defines the reference to a GrafanaInstance
@@ -57,6 +67,7 @@ type GrafanaInstanceRef struct {
 type GrafanaDashboardStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	FolderUID string `json:"folderUID,omitempty"`
 }
 
 //+kubebuilder:object:root=true

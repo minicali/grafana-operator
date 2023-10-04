@@ -129,6 +129,37 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 	}
 
+	folderID := int64(0)
+	if !grafana.IsGeneralFolder(grafanaDashboard.Spec.Folder) {
+
+		// Ensure the folder exists and get its UID
+		folderUID, err := grafanaClient.EnsureFolder(log, grafanaDashboard)
+		if err != nil {
+			log.Error(err, "Failed to ensure Grafana folder")
+			return ctrl.Result{}, err
+		}
+
+		// Update the status with the folder UID if it's not already set
+		if grafanaDashboard.Status.FolderUID != folderUID {
+			grafanaDashboard.Status.FolderUID = folderUID
+			if err := r.Status().Update(ctx, grafanaDashboard); err != nil {
+				log.Error(err, "Failed to update GrafanaDashboard status")
+				return ctrl.Result{}, err
+			}
+		}
+
+		folderID, err = grafanaClient.GetFolderIDByUID(folderUID)
+		if err != nil {
+			log.Error(err, "Failed to fetch grafana folder ID")
+			return ctrl.Result{}, err
+		}
+	}
+
+	if err = grafanaClient.UpsertDashboard(log, grafanaDashboard, folderID); err != nil {
+		log.Error(err, "Failed to create grafana Dashboard on instance")
+		return ctrl.Result{}, err
+	}
+
 	// Requeue for periodic sync
 	syncPeriod := grafanaDashboard.Spec.SyncPeriod.Duration
 	return ctrl.Result{RequeueAfter: syncPeriod}, nil

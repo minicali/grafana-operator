@@ -39,6 +39,8 @@ spec:
                 description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                   Important: Run "make" to regenerate code after modifying this file'
                 type: string
+              folder:
+                type: string
               grafanaInstanceRef:
                 description: Reference to the GrafanaInstance that this dashboard
                   should be associated with
@@ -51,11 +53,24 @@ spec:
                 - name
                 - namespace
                 type: object
+              name:
+                type: string
+              syncPeriod:
+                description: SyncPeriod is the time duration to wait between each
+                  sync operation. The operator will check the actual state in Grafana
+                  and reconcile it with the desired state defined in the custom resource.
+                type: string
             required:
             - grafanaInstanceRef
             type: object
           status:
             description: GrafanaDashboardStatus defines the observed state of GrafanaDashboard
+            properties:
+              folderUID:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
             type: object
         type: object
     served: true

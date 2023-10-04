@@ -86,6 +86,8 @@ spec:
                       - type
                       type: object
                     type: array
+                  serviceURL:
+                    type: string
                 type: object
             type: object
         type: object

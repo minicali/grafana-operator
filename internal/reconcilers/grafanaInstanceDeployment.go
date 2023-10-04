@@ -24,6 +24,7 @@ func NewDeploymentReconciler(client client.Client) *DeploymentReconciler {
 		Client: client,
 	}
 }
+
 func (r *DeploymentReconciler) Reconcile(ctx context.Context, cr *v1alpha1.GrafanaInstance, log logr.Logger) error {
 	log = log.WithValues("Resource", "Deployment")
 	log.Info("Reconciling Deployment")

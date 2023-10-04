@@ -44,6 +44,7 @@ const (
 	GrafanaInstanceStagePVC        grafanaInstanceReconcileStages = "pvc"
 	GrafanaInstanceStageSecret     grafanaInstanceReconcileStages = "secret"
 	GrafanaInstanceStageDeployment grafanaInstanceReconcileStages = "deployment"
+	GrafanaInstanceStageService    grafanaInstanceReconcileStages = "service"
 )
 
 var reconcileStages = []grafanaInstanceReconcileStages{
@@ -51,6 +52,7 @@ var reconcileStages = []grafanaInstanceReconcileStages{
 	GrafanaInstanceStageConfigMap,
 	GrafanaInstanceStagePVC,
 	GrafanaInstanceStageDeployment,
+	GrafanaInstanceStageService,
 }
 
 //+kubebuilder:rbac:groups=grafana.minicali.com,resources=grafanainstances,verbs=get;list;watch;create;update;patch;delete
@@ -130,6 +132,8 @@ func (r *GrafanaInstanceReconciler) getReconcilerPerStage(stage grafanaInstanceR
 		return reconcilers.NewSecretReconciler(r.Client)
 	case GrafanaInstanceStageDeployment:
 		return reconcilers.NewDeploymentReconciler(r.Client)
+	case GrafanaInstanceStageService:
+		return reconcilers.NewServiceReconciler(r.Client)
 	default:
 		return nil
 	}

@@ -42,6 +42,18 @@ rules:
   - update
   - watch
 - apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - apps
   resources:
   - deployments
@@ -53,6 +65,32 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - grafana.minicali.com
+  resources:
+  - grafanadashboards
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - grafana.minicali.com
+  resources:
+  - grafanadashboards/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - grafana.minicali.com
+  resources:
+  - grafanadashboards/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - grafana.minicali.com
   resources:

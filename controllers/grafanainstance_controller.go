@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,6 +63,7 @@ var reconcileStages = []grafanaInstanceReconcileStages{
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -101,9 +103,18 @@ func (r *GrafanaInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
+	// Get the service URL
+	service := &corev1.Service{}
+	err = r.Client.Get(ctx, client.ObjectKey{Name: helpers.GetPrefixedName(cr.Name, "service"), Namespace: cr.Namespace}, service)
+	if err != nil {
+		log.Error(err, "Failed to get Service for status update")
+		return ctrl.Result{}, err
+	}
+
 	// Update GrafanaInstanceStatus
 	cr.Status.GrafanaUI.AvailableReplicas = fmt.Sprintf("%d/%d", deployment.Status.AvailableReplicas, *deployment.Spec.Replicas)
 	cr.Status.GrafanaUI.Conditions = deployment.Status.Conditions
+	cr.Status.GrafanaUI.ServiceURL = helpers.GetServiceURL(service)
 
 	// Update the GrafanaInstance status
 	if err := r.Status().Update(ctx, cr); err != nil {

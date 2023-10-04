@@ -1,0 +1,12 @@
+apiVersion: grafana.minicali.com/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  labels:
+    app.kubernetes.io/name: grafanadashboard
+    app.kubernetes.io/instance: grafanadashboard-sample
+    app.kubernetes.io/part-of: grafana-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: grafana-operator
+  name: grafanadashboard-sample
+spec:
+  # TODO(user): Add fields here

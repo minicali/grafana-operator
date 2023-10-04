@@ -44,6 +44,7 @@ type GrafanaInstanceStatus struct {
 type GrafanaUIStatus struct {
 	AvailableReplicas string                       `json:"availableReplicas,omitempty"`
 	Conditions        []appsv1.DeploymentCondition `json:"conditions,omitempty"`
+	ServiceURL        string                       `json:"serviceURL,omitempty"`
 }
 
 //+kubebuilder:object:root=true

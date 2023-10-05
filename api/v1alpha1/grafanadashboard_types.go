@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"time"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -33,9 +34,14 @@ const (
 type GrafanaDashboardSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Content string `json:"content,omitempty"`
-	Folder  string `json:"folder,omitempty"`
-	Name    string `json:"name,omitempty"`
+	// +optional
+	Json apiextensionsv1.JSON `json:"json,omitempty"`
+
+	// +optional
+	Folder string `json:"folder,omitempty"`
+
+	// +optional
+	Name string `json:"name"`
 
 	// SyncPeriod is the time duration to wait between each sync operation.
 	// The operator will check the actual state in Grafana and reconcile it with the desired state defined in the custom resource.

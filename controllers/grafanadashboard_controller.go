@@ -21,6 +21,7 @@ import (
 
 	"github.com/minicali/grafana-operator/internal/grafana"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -60,6 +61,10 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	// your code to get the GrafanaDashboard resource
 	grafanaDashboard := &grafanav1alpha1.GrafanaDashboard{}
 	if err := r.Get(ctx, req.NamespacedName, grafanaDashboard); err != nil {
+		if errors.IsNotFound(err) {
+			log.Info("GrafanaDashboard resource not found. Ignoring since object must be deleted.")
+			return ctrl.Result{}, nil
+		}
 		log.Error(err, "unable to fetch GrafanaDashboard")
 		return ctrl.Result{}, err
 	}
@@ -129,13 +134,12 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 	}
 
-	folderID := int64(0)
+	folderUID := ""
 	if !grafana.IsGeneralFolder(grafanaDashboard.Spec.Folder) {
 
 		// Ensure the folder exists and get its UID
-		folderUID, err := grafanaClient.EnsureFolder(log, grafanaDashboard)
+		folderUID, err = grafanaClient.EnsureFolder(log, grafanaDashboard)
 		if err != nil {
-			log.Error(err, "Failed to ensure Grafana folder")
 			return ctrl.Result{}, err
 		}
 
@@ -147,16 +151,9 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 				return ctrl.Result{}, err
 			}
 		}
-
-		folderID, err = grafanaClient.GetFolderIDByUID(folderUID)
-		if err != nil {
-			log.Error(err, "Failed to fetch grafana folder ID")
-			return ctrl.Result{}, err
-		}
 	}
 
-	if err = grafanaClient.UpsertDashboard(log, grafanaDashboard, folderID); err != nil {
-		log.Error(err, "Failed to create grafana Dashboard on instance")
+	if err = grafanaClient.UpsertDashboard(log, grafanaDashboard, folderUID); err != nil {
 		return ctrl.Result{}, err
 	}
 

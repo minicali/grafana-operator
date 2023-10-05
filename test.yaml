@@ -1,0 +1,16 @@
+apiVersion: grafana.minicali.com/v1alpha1
+kind: GrafanaInstance
+metadata:
+  name: my-grafana-instance
+  namespace: default
+spec:
+  credentialsSecretName: my-grafana-credentials-secret
+  image: grafana/grafana-enterprise:10.0.0  # Assuming you added an 'image' field
+  port: 3000  # Assuming you added a 'port' field
+  iniConfig:
+    server:
+      domain: "localhost"
+      root_url: "https://%(domain)s"
+    metrics:
+      enabled: "true"
+      disable_total_stats: "false"

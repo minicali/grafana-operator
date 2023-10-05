@@ -1,0 +1,24 @@
+apiVersion: grafana.minicali.com/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: my-grafana-dashboard
+  namespace: default
+spec:
+  json: |
+    {
+      "title": "My Dashboard",
+      "panels": [
+        {
+          "title": "CPU Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)"
+            }
+          ]
+        }
+      ]
+    }
+  grafanaInstanceRef:
+    name: my-grafana-instance
+    namespace: default

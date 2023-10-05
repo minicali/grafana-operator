@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -29,9 +30,10 @@ type GrafanaInstanceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	Image                 string `json:"image,omitempty"`
-	Port                  int32  `json:"port,omitempty"`
-	CredentialsSecretName string `json:"credentialsSecretName,omitempty"`
+	Image                 string                          `json:"image,omitempty"`
+	Port                  int32                           `json:"port,omitempty"`
+	CredentialsSecretName string                          `json:"credentialsSecretName,omitempty"`
+	INIConfig             map[string]apiextensionsv1.JSON `json:"iniConfig,omitempty"`
 }
 
 // GrafanaInstanceStatus defines the observed state of GrafanaInstance

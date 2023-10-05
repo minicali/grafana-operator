@@ -39,6 +39,10 @@ spec:
                 type: string
               image:
                 type: string
+              iniConfig:
+                additionalProperties:
+                  x-kubernetes-preserve-unknown-fields: true
+                type: object
               port:
                 format: int32
                 type: integer

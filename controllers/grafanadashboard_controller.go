@@ -115,8 +115,11 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	if grafanaDashboard.DeletionTimestamp != nil {
 		// The object is being deleted
 		if containsString(grafanaDashboard.ObjectMeta.Finalizers, grafanaDashboardFinalizer) {
-			// Delete object from grafana here
 
+			// Delete the dashboard from Grafana
+			if err = grafanaClient.DeleteDashboard(log, grafanaDashboard.Status.DashboardUID); err != nil {
+				return ctrl.Result{}, err
+			}
 			// Remove the finalizer from the list and update it.
 			grafanaDashboard.ObjectMeta.Finalizers = removeString(grafanaDashboard.ObjectMeta.Finalizers, grafanaDashboardFinalizer)
 			if err := r.Update(context.Background(), grafanaDashboard); err != nil {
@@ -152,9 +155,18 @@ func (r *GrafanaDashboardReconciler) Reconcile(ctx context.Context, req ctrl.Req
 			}
 		}
 	}
-
-	if err = grafanaClient.UpsertDashboard(log, grafanaDashboard, folderUID); err != nil {
+	dashboardUID, err := grafanaClient.UpsertDashboard(log, grafanaDashboard, folderUID)
+	if err != nil {
 		return ctrl.Result{}, err
+	}
+
+	// Update the status with the dashboard UID if it's not already set
+	if grafanaDashboard.Status.DashboardUID != dashboardUID {
+		grafanaDashboard.Status.DashboardUID = dashboardUID
+		if err := r.Status().Update(ctx, grafanaDashboard); err != nil {
+			log.Error(err, "Failed to update GrafanaDashboard status")
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Requeue for periodic sync

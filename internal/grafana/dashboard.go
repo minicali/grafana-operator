@@ -11,14 +11,13 @@ import (
 	"github.com/minicali/grafana-operator/internal/helpers"
 )
 
-func (gc *GrafanaClient) UpsertDashboard(log logr.Logger, cr *grafanav1alpha1.GrafanaDashboard, folderUID string) error {
+func (gc *GrafanaClient) UpsertDashboard(log logr.Logger, cr *grafanav1alpha1.GrafanaDashboard, folderUID string) (string, error) {
 	log = log.WithValues("Resource", "Dashboard")
-	log.Info("Reconciling GrafanaDashboard")
 
 	dashboardModel, err := getModelFromCR(cr)
 	if err != nil {
 		log.Error(err, "Failed to create/update Grafana dashboard")
-		return err
+		return "", err
 	}
 
 	resp, err := gc.Client.NewDashboard(grapi.Dashboard{
@@ -30,15 +29,33 @@ func (gc *GrafanaClient) UpsertDashboard(log logr.Logger, cr *grafanav1alpha1.Gr
 
 	if err != nil {
 		log.Error(err, "Failed to create/update Grafana dashboard")
-		return err
+		return "", err
 	}
 
 	if resp.Status != "success" {
 		log.Error(nil, "Error creating dashboard, status was not 'success'", "status", resp.Status)
-		return fmt.Errorf("error creating dashboard, status was %v", resp.Status)
+		return "", fmt.Errorf("error creating dashboard, status was %v", resp.Status)
 	}
 
 	log.Info("Successfully created/updated Grafana dashboard", "dashboardName", cr.Spec.Name)
+	return resp.UID, nil
+}
+
+func (gc *GrafanaClient) DeleteDashboard(log logr.Logger, dashboardUID string) error {
+	log = log.WithValues("Resource", "Dashboard")
+
+	if dashboardUID == "" {
+		log.Error(nil, "Error deleting dashboard, UID is missing")
+		return fmt.Errorf("error deleting dashboard, UID is missing")
+	}
+
+	err := gc.Client.DeleteDashboardByUID(dashboardUID)
+	if err != nil {
+		log.Error(err, "Failed to delete Grafana dashboard")
+		return err
+	}
+
+	log.Info("Successfully deleted Grafana dashboard", "dashboardUID", dashboardUID)
 	return nil
 }
 

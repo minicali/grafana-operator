@@ -73,7 +73,8 @@ type GrafanaInstanceRef struct {
 type GrafanaDashboardStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	FolderUID string `json:"folderUID,omitempty"`
+	FolderUID    string `json:"folderUID,omitempty"`
+	DashboardUID string `json:"dashboardUID,omitempty"`
 }
 
 //+kubebuilder:object:root=true

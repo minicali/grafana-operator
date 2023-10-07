@@ -5,8 +5,8 @@ metadata:
   namespace: default
 spec:
   credentialsSecretName: my-grafana-credentials-secret
-  image: grafana/grafana-enterprise:10.0.0  # Assuming you added an 'image' field
-  port: 3000  # Assuming you added a 'port' field
+  image: grafana/grafana-enterprise:10.0.0 
+  port: 3000
   iniConfig:
     server:
       domain: "localhost"
@@ -14,3 +14,4 @@ spec:
     metrics:
       enabled: "true"
       disable_total_stats: "false"
+k 
